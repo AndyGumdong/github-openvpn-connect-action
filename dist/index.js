@@ -794,49 +794,21 @@ const exec = __webpack_require__(264)
 const Tail = __webpack_require__(824)/* .Tail */ .x
 
 const run = (callback) => {
-  const configFile = core.getInput('config_file').trim()
-  const username = core.getInput('username').trim()
-  const password = core.getInput('password').trim()
-  const clientKey = core.getInput('client_key').trim()
-  const tlsAuthKey = core.getInput('tls_auth_key').trim()
+  const path = 'client.ovpn'
+  const config = core.getInput('config').trim()
 
-  if (!fs.existsSync(configFile)) {
-    throw new Error(`config file '${configFile}' not found`)
+  if (!config) {
+    throw new Error('config file content is required!')
   }
 
-  // 1. Configure client
-
-  fs.appendFileSync(configFile, '\n# ----- modified by action -----\n')
-
-  // username & password auth
-  if (username && password) {
-    fs.appendFileSync(configFile, 'auth-user-pass up.txt\n')
-    fs.writeFileSync('up.txt', [username, password].join('\n'))
-  }
-
-  // client certificate auth
-  if (clientKey) {
-    fs.appendFileSync(configFile, 'key client.key\n')
-    fs.writeFileSync('client.key', clientKey)
-  }
-
-  if (tlsAuthKey) {
-    fs.appendFileSync(configFile, 'tls-auth ta.key 1\n')
-    fs.writeFileSync('ta.key', tlsAuthKey)
-  }
-
-  core.info('========== begin configuration ==========')
-  core.info(fs.readFileSync(configFile, 'utf8'))
-  core.info('=========== end configuration ===========')
-
-  // 2. Run openvpn
+  fs.writeFileSync(path, config)
 
   // prepare log file
   fs.writeFileSync('openvpn.log', '')
   const tail = new Tail('openvpn.log')
 
   try {
-    exec(`sudo openvpn --config ${configFile} --daemon --log openvpn.log --writepid openvpn.pid`)
+    exec(`sudo openvpn --config ${path} --daemon --log openvpn.log --writepid openvpn.pid`)
   } catch (error) {
     core.error(fs.readFileSync('openvpn.log', 'utf8'))
     tail.unwatch()
