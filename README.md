@@ -18,7 +18,7 @@ GitHub Action for connecting to OpenVPN server.
           sudo apt update
           sudo apt install -y openvpn openvpn-systemd-resolved
       - name: Connect to VPN
-        uses: "uzaysan/github-openvpn-connect-action@0.0.1"
+        uses: "uzaysan/github-openvpn-connect-action@0.0.2"
         with:
           config: ${{ secrets.OVPN_CONFIG_CONTENT }}
       - name: Build something
