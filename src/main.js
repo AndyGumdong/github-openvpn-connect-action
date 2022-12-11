@@ -27,7 +27,7 @@ const run = (callback) => {
 
   tail.on('line', (data) => {
     core.info(data)
-    if (data.includes('Initialization Sequence Completed')) {
+    if (data.includes('Peer Connection Initiated with')) {
       tail.unwatch()
       clearTimeout(timer)
       const pid = fs.readFileSync('openvpn.pid', 'utf8').trim()
